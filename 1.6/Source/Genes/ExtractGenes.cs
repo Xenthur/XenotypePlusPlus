@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HarmonyLib;
 using RimWorld;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -135,17 +136,38 @@ namespace XenotypePlusPlus
       return true;
     }
 
-    public static List<Gene> GetGenesToCopy(Pawn pawn)
+    public static List<Gene> GetGenesToCopy(Pawn pawn, out XenotypeDef copiedXenotype, out string copiedXenotypeName, out XenotypeIconDef copiedXenotypeIcon)
     {
       List<Gene> result = new List<Gene>();
       var genes = pawn.genes.GenesListForReading;
+      GeneDef xenoCarrierGeneDef = DefDatabase<GeneDef>.GetNamedSilentFail("BF_XenoCarrier");
       for (int i = 0; i < genes.Count; i++)
       {
-        if (genes[i].Active && genes[i].def.endogeneCategory != EndogeneCategory.Melanin)
+        if ((genes[i].Active || genes[i].overriddenByGene.def == xenoCarrierGeneDef) && genes[i].def.endogeneCategory != EndogeneCategory.Melanin)
         {
           result.Add(genes[i]);
         }
       }
+
+      copiedXenotype = null;
+      copiedXenotypeName = null;
+      copiedXenotypeIcon = null;
+
+      bool separateGermline = pawn.SeparateGermline(out GermlineComp germlineData, true);
+
+      if (!separateGermline)
+      {
+        if (!pawn.genes.Xenotype.IsCopyable())
+        {
+          copiedXenotype = pawn.genes.Xenotype;
+        }
+        else if (pawn.genes.xenotypeName != null)
+        {
+          copiedXenotypeName = pawn.genes.xenotypeName;
+          copiedXenotypeIcon = pawn.genes.iconDef;
+        }
+      }
+      Log.Error(copiedXenotypeName);
 
       return result;
     }
@@ -155,7 +177,9 @@ namespace XenotypePlusPlus
       QuestUtility.SendQuestTargetSignals(caster.questTags, "XenogermReimplanted", caster.Named("SUBJECT"));
       caster.genes.Xenogenes.RemoveAll(gene => !genesToRetain.Contains(gene.def));
 
-      foreach (Gene gene in GetGenesToCopy(target))
+      List<Gene> genesToCopy = GetGenesToCopy(target, out XenotypeDef copiedXenotype, out string copiedXenotypeName, out XenotypeIconDef copiedXenotypeIcon);
+
+      foreach (Gene gene in genesToCopy)
       {
         caster.genes.AddGene(gene.def, xenogene: true);
       }
@@ -166,6 +190,28 @@ namespace XenotypePlusPlus
       if (!caster.HasProfuseGenes())
       {
         caster.health.AddHediff(HediffDefOf.XenogerminationComa, null, null);
+      }
+
+      if (copiedXenotype != null)
+      {
+        AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype")(caster.genes) = copiedXenotype;
+        caster.genes.xenotypeName = null;
+        caster.genes.iconDef = null;
+        caster.genes.hybrid = false;
+      }
+      else if (copiedXenotypeName != null)
+      {
+        AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype")(caster.genes) = XenotypeDefOf.Baseliner;
+        caster.genes.xenotypeName = copiedXenotypeName;
+        caster.genes.iconDef = copiedXenotypeIcon;
+        caster.genes.hybrid = false;
+      }
+      else
+      {
+        AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype")(caster.genes) = XenotypeDefOf.Baseliner;
+        caster.genes.xenotypeName = "Hybrid".Translate();
+        caster.genes.iconDef = null;
+        caster.genes.hybrid = true;
       }
 
       GeneUtility.ExtractXenogerm(target);

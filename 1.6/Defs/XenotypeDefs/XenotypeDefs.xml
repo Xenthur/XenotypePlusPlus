@@ -3,6 +3,6 @@
 	<XenotypeDef>
 		<defName>NoXenogerm</defName>
 		<label>no xenogerm</label>
-		<iconPath>XenotypeIcons/NoXenogerm</iconPath>
+		<iconPath>XenotypeIcons/XPP_NoXenogerm</iconPath>
 	</XenotypeDef>
 </Defs>

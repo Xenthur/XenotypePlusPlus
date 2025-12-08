@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
+using static HarmonyLib.Code;
 using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 namespace XenotypePlusPlus
@@ -77,7 +78,7 @@ namespace XenotypePlusPlus
         {
           return null;
         }
-        if (germline != XenotypeDefOf.Baseliner || hybrid || Current.ProgramState != ProgramState.Playing)
+        if (germline.IsCopyable() || hybrid || Current.ProgramState != ProgramState.Playing)
         {
           return null;
         }
@@ -207,15 +208,7 @@ namespace XenotypePlusPlus
   [HarmonyPatch]
   public static class XenotypeChanges
   {
-    public static bool SeparateGermline(this Pawn pawn, out GermlineComp germlineData)
-    {
-      germlineData = pawn.GetComp<GermlineComp>();
-      if (germlineData.CustomXenotype != null)
-      {
-        return germlineData.CustomXenotype != pawn.genes.CustomXenotype;
-      }
-      return germlineData.Germline != pawn.genes.Xenotype || germlineData.germlineName != pawn.genes.xenotypeName;
-    }
+    
 
     [HarmonyPatch(typeof(GeneUIUtility), nameof(GeneUIUtility.DrawGenesInfo))]
     [HarmonyTranspiler]
@@ -348,7 +341,6 @@ namespace XenotypePlusPlus
         {
           flag2 = true;
           yield return codes[i];
-          //yield return new CodeInstruction(OpCodes.Call, testMethod);
           yield return new CodeInstruction(OpCodes.Call, validateMethod);
           yield return new CodeInstruction(OpCodes.Brtrue, label2);
           yield return new CodeInstruction(OpCodes.Ldarg_0);
@@ -434,6 +426,56 @@ namespace XenotypePlusPlus
         }
       }
 
+    }
+
+    private static void UpdateXenogerm(int pawnIndex, CustomXenotype customXenotype)
+    {
+      forcedXenogerms[pawnIndex] = null;
+      forcedCustomXenogerms[pawnIndex] = customXenotype;
+      allowedXenogerms[pawnIndex] = null;
+    }
+
+    //[HarmonyDebug]
+    [HarmonyPatch(typeof(Dialog_CreateXenotype), "AcceptInner")]
+    [HarmonyTranspiler]
+    public static IEnumerable<CodeInstruction> PatchCreateXenotype(IEnumerable<CodeInstruction> instructions, ILGenerator il)
+    {
+      var updateMethod = AccessTools.Method(typeof(XenotypeChanges), nameof(UpdateXenogerm));
+
+      bool flag = false;
+      bool flag2 = false;
+      Label label = il.DefineLabel();
+      Label label2 = il.DefineLabel();
+
+      foreach (CodeInstruction instruction in instructions)
+      {
+        yield return instruction;
+        if (!flag && instruction.opcode == OpCodes.Stloc_2)
+        {
+          flag = true;
+          yield return new CodeInstruction(OpCodes.Ldarg_0);
+          yield return CodeInstruction.LoadField(typeof(Dialog_CreateXenotype), "inheritable");
+          yield return new CodeInstruction(OpCodes.Brtrue, label);
+
+          yield return new CodeInstruction(OpCodes.Ldarg_0);
+          yield return CodeInstruction.LoadField(typeof(Dialog_CreateXenotype), "generationRequestIndex");
+
+          Type targetInnerType = AccessTools.FirstInner(typeof(Dialog_CreateXenotype), (type) =>
+            type.GetDeclaredFields().Where((FieldInfo field) => field.Name == "customXenotype").Any());
+
+          yield return new CodeInstruction(OpCodes.Ldloc_0);
+          yield return CodeInstruction.LoadField(targetInnerType, "customXenotype");
+          yield return new CodeInstruction(OpCodes.Call, updateMethod);
+
+          yield return new CodeInstruction(OpCodes.Br, label2);
+          yield return new CodeInstruction(OpCodes.Nop).WithLabels(label);
+        }
+        else if (!flag2 && instruction.opcode == OpCodes.Call && instruction.operand is MethodInfo methodInfo && methodInfo.Name == "SetGenerationRequest")
+        {
+          flag2 = true;
+          yield return new CodeInstruction(OpCodes.Nop).WithLabels(label2);
+        }
+      }
     }
 
     public static void UpdateGermline(Pawn_GeneTracker __instance, XenotypeDef xenotype)
@@ -532,6 +574,75 @@ namespace XenotypePlusPlus
         width = num2
       });
     }
+
+    //[HarmonyPatch(typeof(Pawn_GeneTracker), "get_CustomXenotype")]
+    //[HarmonyPrefix]
+    //public static bool PatchGetCustomXenotype(Pawn_GeneTracker __instance, ref CustomXenotype __result)
+    //{
+    //  var cachedHasCustomXenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, bool?>("cachedHasCustomXenotype");
+    //  var cachedCustomXenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, CustomXenotype>("cachedCustomXenotype");
+
+    //  if (__instance.Xenotype != XenotypeDefOf.Baseliner || __instance.hybrid || Current.ProgramState != ProgramState.Playing)
+    //  {
+    //    __result = null;
+    //  }
+    //  if (!cachedHasCustomXenotype(__instance).HasValue)
+    //  {
+    //    cachedHasCustomXenotype(__instance) = false;
+    //    foreach (CustomXenotype customXenotype in Current.Game.customXenotypeDatabase.customXenotypes.Where((CustomXenotype x) => !x.inheritable))
+    //    {
+    //      if (GeneUtility.PawnIsCustomXenotype(__instance.pawn, customXenotype))
+    //      {
+    //        cachedHasCustomXenotype(__instance) = true;
+    //        cachedCustomXenotype(__instance) = customXenotype;
+    //        break;
+    //      }
+    //    }
+
+    //    if (!cachedHasCustomXenotype(__instance).HasValue || !cachedHasCustomXenotype(__instance).Value)
+    //    {
+    //      foreach (CustomXenotype customXenotype in Current.Game.customXenotypeDatabase.customXenotypes.Where((CustomXenotype x) => x.inheritable))
+    //      {
+    //        if (GeneUtility.PawnIsCustomXenotype(__instance.pawn, customXenotype))
+    //        {
+    //          cachedHasCustomXenotype(__instance) = true;
+    //          cachedCustomXenotype(__instance) = customXenotype;
+    //          break;
+    //        }
+    //      }
+    //    }
+    //  }
+    //  __result = cachedCustomXenotype(__instance);
+
+    //  return false;
+    //}
+
+    //[HarmonyPatch(typeof(GeneUtility), nameof(GeneUtility.PawnIsCustomXenotype))]
+    //[HarmonyPostfix]
+    //public static void debugShit(Pawn pawn, CustomXenotype custom)
+    //{
+    //  if (!ModsConfig.BiotechActive || pawn.genes == null)
+    //  {
+    //    Log.Error(pawn.Name + " is not a " + custom.name + " because no genes");
+    //  }
+    //  List<Gene> list = (custom.inheritable ? pawn.genes.Endogenes : pawn.genes.Xenogenes);
+    //  int i;
+    //  for (i = 0; i < custom.genes.Count; i++)
+    //  {
+    //    if (custom.genes[i].passOnDirectly && !list.Any((Gene x) => x.def == custom.genes[i]))
+    //    {
+    //      Log.Error(pawn.Name + " is not a " + custom.name + " because he is missing this gene: " + custom.genes[i].defName);
+    //    }
+    //  }
+    //  for (int j = 0; j < list.Count; j++)
+    //  {
+    //    if (list[j].def.passOnDirectly && !custom.genes.Contains(list[j].def))
+    //    {
+    //      Log.Error(pawn.Name + " is not a " + custom.name + " because this gene does not belong: " + list[j].def.defName);
+    //    }
+    //  }
+    //  Log.Error(pawn.Name + " is a " + custom.name);
+    //}
 
     [HarmonyPatch(typeof(Ideo), nameof(Ideo.IsPreferredXenotype))]
     [HarmonyPostfix]
@@ -634,7 +745,6 @@ namespace XenotypePlusPlus
       return [.. xenotypes.Where((CustomXenotype x) => x.inheritable)];
     }
 
-    //[HarmonyDebug]
     [HarmonyPatch(typeof(CharacterCardUtility), "LifestageAndXenotypeOptions")]
     [HarmonyTranspiler]
     public static IEnumerable<CodeInstruction> UpdateXenotypeButtons(IEnumerable<CodeInstruction> instructions)
@@ -787,7 +897,6 @@ namespace XenotypePlusPlus
       Rect rect5 = rect4;
       rect5.y += rect4.height + 4f;
       rect5.height = Text.LineHeight;
-      //Widgets.Label(rect5, GetXenotypeLabel(startingPawnIndex).Truncate(rect5.width));
       Widgets.Label(rect5, xenotypeLabel.Truncate(rect5.width));
       Text.Anchor = TextAnchor.UpperLeft;
       Rect rect6 = new Rect(rect4.x, rect4.y, rect4.width, rect5.yMax - rect4.yMin);

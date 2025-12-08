@@ -12,6 +12,7 @@ namespace XenotypePlusPlus
     {
       gene.pawn.genes.Xenogenes.RemoveAll((Gene g) => g.def == gene.def);
       gene.pawn.genes.Endogenes.RemoveAll((Gene g) => g.def == gene.def);
+      AccessTools.FieldRefAccess<Pawn_GeneTracker, List<Gene>>("cachedGenes")(gene.pawn.genes) = null;
     }
 
     public static string GeneListNatural(this List<GeneDef> genes)
@@ -41,6 +42,27 @@ namespace XenotypePlusPlus
       return xenotype.inheritable || xenotype == XenotypeDefOf.Baseliner;
     }
 
+    private static readonly List<XenotypeDef> uncopyable = [XenotypeDefOf.Baseliner, XPPDefs.NoXenogerm];
+
+    public static bool IsCopyable(this XenotypeDef xenotype)
+    {
+      return !uncopyable.Contains(xenotype);
+    }
+
+    public static bool SeparateGermline(this Pawn pawn, out GermlineComp germlineData, bool ignoreSettings = false)
+    {
+      germlineData = pawn.GetComp<GermlineComp>();
+      if (germlineData.CustomXenotype != null)
+      {
+        return germlineData.CustomXenotype != pawn.genes.CustomXenotype;
+      }
+      if (germlineData.Germline == XenotypeDefOf.Baseliner && germlineData.germlineName == null && (ignoreSettings || XenotypePlusPlus.settings.hideBaselinerGermline))
+      {
+        return false;
+      }
+      return germlineData.Germline != pawn.genes.Xenotype || germlineData.germlineName != pawn.genes.xenotypeName;
+    }
+
     public static void RemoveXenogerm(this Pawn_GeneTracker genes)
     {
       genes.ClearXenogenes();
@@ -48,12 +70,14 @@ namespace XenotypePlusPlus
       {
         GermlineComp germlineData = genes.pawn.GetComp<GermlineComp>();
         var xenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype");
-        var xenotypeName = AccessTools.FieldRefAccess<Pawn_GeneTracker, string>("xenotypeName");
+        //var xenotypeName = AccessTools.FieldRefAccess<Pawn_GeneTracker, string>("xenotypeName");
+        //var xenotypeIcon = AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeIconDef>("iconDef");
         var cachedHasCustomXenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, bool?>("cachedHasCustomXenotype");
         var cachedCustomXenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, CustomXenotype>("cachedCustomXenotype");
 
         xenotype(genes) = germlineData.Germline ?? XenotypeDefOf.Baseliner;
-        xenotypeName(genes) = null;
+        genes.xenotypeName = germlineData.germlineName;
+        genes.iconDef = germlineData.iconDef;
         cachedHasCustomXenotype(genes) = null;
         cachedCustomXenotype(genes) = null;
 

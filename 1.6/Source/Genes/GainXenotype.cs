@@ -142,9 +142,10 @@ namespace XenotypePlusPlus
     public static List<GeneDef> GenerateXenotypeGenes()
     {
       var result = new List<GeneDef>();
-      var allXenotypes = DefDatabase<XenotypeDef>.AllDefsListForReading;
+      var allXenotypes = DefDatabase<XenotypeDef>.AllDefsListForReading.Where((x) => x != XPPDefs.NoXenogerm);
 
       var gainTemplate = DefDatabase<GeneTemplate>.GetNamed("BF_GainXenotypeTemplate");
+      var nxgTemplate = DefDatabase<GeneTemplate>.GetNamed("BF_NoXenogermTemplate");
       if (gainTemplate == null)
       {
         Log.Warning("XenotypePlusPlus DefGen: GenerateXenotypeGenes: Could not find the Gain Xenotype Template. Gain Xenotype genes will not be generated.");
@@ -157,7 +158,7 @@ namespace XenotypePlusPlus
           {
             result.Add(GenerateGainXenotypeGene(xeno, gainTemplate));
           }
-
+          result.Add(GenerateNoXenogermGene(nxgTemplate));
         }
         catch (Exception e)
         {
@@ -215,9 +216,9 @@ namespace XenotypePlusPlus
       var geneDef = new GeneDef
       {
         defName = defName,
-        label = String.Format(template.label, xenoDef.label, xenotypeCat),
-        description = String.Format(template.description, xenoDef.label, xenotypeCat, geneCat),
-        customEffectDescriptions = [String.Format(template.customEffectDescriptions[0], xenoDef.label, xenotypeCat)],
+        label = string.Format(template.label, xenoDef.label, xenotypeCat),
+        description = string.Format(template.description, xenoDef.label, xenotypeCat, geneCat),
+        customEffectDescriptions = [string.Format(template.customEffectDescriptions[0], xenoDef.label, xenotypeCat)],
         iconPath = xenoDef.iconPath,
         biostatCpx = 0,
         biostatMet = 0,
@@ -225,6 +226,35 @@ namespace XenotypePlusPlus
         canGenerateInGeneSet = template.canGenerateInGeneSet,
         selectionWeight = template.selectionWeight,
         modExtensions = [new GainXenotypeExtension(xenoDef)]
+      };
+
+      return geneDef;
+    }
+
+    public static GeneDef GenerateNoXenogermGene(GeneTemplate template)
+    {
+      if (XPPDefs.NoXenogerm == null || template == null)
+      {
+        Log.Error($"XenotypePlusPlus DefGen: GenerateXenotypeGene: One of the parameters was null." +
+            $"\nXenoDef: {XPPDefs.NoXenogerm}, template: {template}");
+        return null;
+      }
+
+      string defName = $"{XPPDefs.NoXenogerm.defName}_gene";
+
+      var geneDef = new GeneDef
+      {
+        defName = defName,
+        label = string.Format(template.label, XPPDefs.NoXenogerm.label),
+        description = string.Format(template.description, "xenogerm"),
+        customEffectDescriptions = [template.customEffectDescriptions[0]],
+        iconPath = XPPDefs.NoXenogerm.iconPath,
+        biostatCpx = 0,
+        biostatMet = 0,
+        displayCategory = template.displayCategory,
+        canGenerateInGeneSet = template.canGenerateInGeneSet,
+        selectionWeight = template.selectionWeight,
+        modExtensions = [new GainXenotypeExtension(XPPDefs.NoXenogerm)]
       };
 
       return geneDef;

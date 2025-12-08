@@ -13,4 +13,17 @@
 		<selectionWeight>0</selectionWeight>
 		<ignoreIllegalLabelCharacterConfigError>true</ignoreIllegalLabelCharacterConfigError>
 	</XenotypePlusPlus.GeneTemplate>
+
+	<XenotypePlusPlus.GeneTemplate>
+		<defName>BF_NoXenogermTemplate</defName>
+		<label>{0}</label>
+		<description>Carriers of this gene will have no xenogerm. All xenogenes will be removed, after which this gene is removed. If multiple {0} xenotype genes are present, one is randomly chosen. You shouldn't ever see this gene in-game.</description>
+		<customEffectDescriptions>
+			<li>Removes all xenogenes, then vanishes</li>
+		</customEffectDescriptions>
+		<displayCategory>BF_GainXenotype</displayCategory>
+		<canGenerateInGeneSet>false</canGenerateInGeneSet>
+		<selectionWeight>0</selectionWeight>
+		<ignoreIllegalLabelCharacterConfigError>true</ignoreIllegalLabelCharacterConfigError>
+	</XenotypePlusPlus.GeneTemplate>
 </Defs>

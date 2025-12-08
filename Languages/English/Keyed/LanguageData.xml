@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
+	<XPPModName>Xenotype++</XPPModName>
+	<HideBaselinerGermline>Hide Baseliner germline</HideBaselinerGermline>
+	<HideBaselinerGermlineToolTip>If a pawn has a xenogerm Xenotype and a Baseliner germline, hide Baseliner when viewing the pawn.</HideBaselinerGermlineToolTip>
 	<NoXenogerm>No xenogerm</NoXenogerm>
 </LanguageData>
