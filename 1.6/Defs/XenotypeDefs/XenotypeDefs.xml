@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
 	<XenotypeDef>
-		<defName>NoXenogerm</defName>
+		<defName>XPP_NoXenogerm</defName>
 		<label>no xenogerm</label>
 		<iconPath>XenotypeIcons/XPP_NoXenogerm</iconPath>
 	</XenotypeDef>

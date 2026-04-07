@@ -22,6 +22,8 @@ namespace XenotypePlusPlus
       Listing_Standard listingStandard = new Listing_Standard();
       listingStandard.Begin(inRect);
       listingStandard.CheckboxLabeled("HideBaselinerGermline".Translate(), ref settings.hideBaselinerGermline, "HideBaselinerGermlineToolTip".Translate());
+      listingStandard.CheckboxLabeled("AllowPreferredGermline".Translate(), ref settings.allowPreferredGermline, "AllowPreferredGermlineToolTip".Translate());
+      listingStandard.CheckboxLabeled("AllowPreferredBaselinerGermline".Translate(), ref settings.allowPreferredBaselinerGermline, "AllowPreferredBaselinerGermlineToolTip".Translate());
       listingStandard.End();
       base.DoSettingsWindowContents(inRect);
     }
@@ -35,10 +37,14 @@ namespace XenotypePlusPlus
   public class XPPSettings : ModSettings
   {
     public bool hideBaselinerGermline;
+    public bool allowPreferredGermline = true;
+    public bool allowPreferredBaselinerGermline;
 
     public override void ExposeData()
     {
       Scribe_Values.Look(ref hideBaselinerGermline, "hideBaselinerGermline");
+      Scribe_Values.Look(ref allowPreferredGermline, "allowPreferredGermline");
+      Scribe_Values.Look(ref allowPreferredBaselinerGermline, "allowPreferredBaselinerGermline");
       base.ExposeData();
     }
 

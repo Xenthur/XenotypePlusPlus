@@ -208,7 +208,7 @@ namespace XenotypePlusPlus
   [HarmonyPatch]
   public static class XenotypeChanges
   {
-    
+
 
     [HarmonyPatch(typeof(GeneUIUtility), nameof(GeneUIUtility.DrawGenesInfo))]
     [HarmonyTranspiler]
@@ -299,7 +299,7 @@ namespace XenotypePlusPlus
 
     public static bool TryNoXenogerm(Pawn_GeneTracker genes, XenotypeDef xenotype)
     {
-      if (xenotype == XPPDefs.NoXenogerm)
+      if (xenotype == XPPDefs.XPP_NoXenogerm)
       {
         genes.RemoveXenogerm();
         return true;
@@ -435,7 +435,6 @@ namespace XenotypePlusPlus
       allowedXenogerms[pawnIndex] = null;
     }
 
-    //[HarmonyDebug]
     [HarmonyPatch(typeof(Dialog_CreateXenotype), "AcceptInner")]
     [HarmonyTranspiler]
     public static IEnumerable<CodeInstruction> PatchCreateXenotype(IEnumerable<CodeInstruction> instructions, ILGenerator il)
@@ -658,15 +657,28 @@ namespace XenotypePlusPlus
         return;
       }
       GermlineComp germlineData = pawn.GetComp<GermlineComp>();
-      if (germlineData == null || (germlineData.Germline == null && germlineData.germlineName == null))
+      if (germlineData == null || germlineData.Germline == null || germlineData.Germline.IsCopyable())
       {
         return;
       }
-      if (germlineData.CustomXenotype != null)
-      {
-        __result = __instance.PreferredCustomXenotypes.Contains(germlineData.CustomXenotype);
-      }
-      __result = __result || __instance.PreferredXenotypes.Contains(germlineData.Germline);
+      // TODO: PawnIsCustomXenotype germline integration, which will make performing a custom xenotype check here redundant
+
+      //if (germlineData.CustomXenotype != null)
+      //{
+      //  //__result = __instance.PreferredCustomXenotypes.Contains(germlineData.CustomXenotype);
+      //  foreach (CustomXenotype preferredCustomXenotype in __instance.PreferredCustomXenotypes)
+      //  {
+      //    if (GeneUtility.PawnIsCustomXenotype(pawn, preferredCustomXenotype))
+      //    {
+      //      return true;
+      //      break;
+      //    }
+      //  }
+      //}
+
+      __result = (germlineData.Germline != pawn.genes.Xenotype && __instance.PreferredXenotypes.Contains(germlineData.Germline))
+        && ((germlineData.Germline == XenotypeDefOf.Baseliner && XenotypePlusPlus.settings.allowPreferredBaselinerGermline)
+        || XenotypePlusPlus.settings.allowPreferredGermline);
     }
 
     [HarmonyPatch(typeof(CharacterCardUtility), nameof(CharacterCardUtility.DrawCharacterCard))]
@@ -715,7 +727,7 @@ namespace XenotypePlusPlus
       {
         return GeneUtility.UniqueXenotypeTex.Texture;
       }
-      return XPPDefs.NoXenogerm.Icon;
+      return XPPDefs.XPP_NoXenogerm.Icon;
     }
 
     private static string GetXenotypeLabel(int startingPawnIndex)
@@ -955,7 +967,7 @@ namespace XenotypePlusPlus
           setupGenerationRequest.Invoke(null, [index2, existing.ForcedXenotype, existing.ForcedCustomXenotype, existing.AllowedXenotypes, 0.5f, (PawnGenerationRequest existing) => allowChange, randomizeCallback, true]);
         }),
       };
-      foreach (XenotypeDef item in DefDatabase<XenotypeDef>.AllDefs.Where((XenotypeDef x) => x != XenotypeDefOf.Baseliner && x != XPPDefs.NoXenogerm && !x.inheritable).OrderBy((XenotypeDef x) => 0f - x.displayPriority))
+      foreach (XenotypeDef item in DefDatabase<XenotypeDef>.AllDefs.Where((XenotypeDef x) => x != XenotypeDefOf.Baseliner && x != XPPDefs.XPP_NoXenogerm && !x.inheritable).OrderBy((XenotypeDef x) => 0f - x.displayPriority))
       {
         XenotypeDef xenotype2 = item;
         list.Add(new FloatMenuOption(xenotype2.LabelCap, delegate

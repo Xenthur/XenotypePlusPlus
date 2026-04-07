@@ -3,5 +3,9 @@
 	<XPPModName>Xenotype++</XPPModName>
 	<HideBaselinerGermline>Hide Baseliner germline</HideBaselinerGermline>
 	<HideBaselinerGermlineToolTip>If a pawn has a xenogerm Xenotype and a Baseliner germline, hide Baseliner when viewing the pawn.</HideBaselinerGermlineToolTip>
+	<AllowPreferredGermline>Allow Preferred germline</AllowPreferredGermline>
+	<AllowPreferredGermlineToolTip>Allow a pawn's non-Baseliner germline to be counted for an ideoligion's Preferred Xenotype even if they have xenogenes</AllowPreferredGermlineToolTip>
+	<AllowPreferredBaselinerGermline>Allow Preferred Baseliner germline</AllowPreferredBaselinerGermline>
+	<AllowPreferredBaselinerGermlineToolTip>Allow a pawn's Baseliner germline to be counted for an ideoligion's Preferred Xenotype even if they have xenogenes</AllowPreferredBaselinerGermlineToolTip>
 	<NoXenogerm>No xenogerm</NoXenogerm>
 </LanguageData>

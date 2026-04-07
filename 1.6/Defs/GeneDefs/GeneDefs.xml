@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
   <GeneDef>
-    <defName>BF_Extract</defName>
+    <defName>XPP_Extract</defName>
     <label>gene extractor</label>
     <description>Carriers of this gene can extract a copy of all of another person's genes through a somewhat gross-looking proboscis organ and integrate them as a new xenogerm. The target's genetic material will then regrow very slowly. If they extract while the target's genes are regrowing, the target will die.</description>
     <displayCategory>Archite</displayCategory>
-    <iconPath>GeneIcons/BF_GeneExtractor</iconPath>
+    <iconPath>GeneIcons/XPP_GeneExtractor</iconPath>
     <biostatMet>0</biostatMet>
     <biostatCpx>3</biostatCpx>
     <biostatArc>1</biostatArc>
     <abilities  Inherit="False">
-      <li>BF_ExtractAbility</li>
+      <li>XPP_ExtractAbility</li>
     </abilities>
     <descriptionHyperlinks>
-      <AbilityDef>BF_ExtractAbility</AbilityDef>
+      <AbilityDef>XPP_ExtractAbility</AbilityDef>
     </descriptionHyperlinks>
   </GeneDef>
 
   <AbilityDef ParentName="AbilityTouchBase">
-    <defName>BF_ExtractAbility</defName>
+    <defName>XPP_ExtractAbility</defName>
     <label>Extract genes</label>
     <description>Extract a willing subject's genes using a special proboscis organ, creating a xenogerm and applying it to this person. If the target's genes are currently regrowing, they will die in the process. If this person also has the Incorporate gene, this ability can also target a corpse, destroying it in the process.\n\nOnce extracted, the new xenogerm will overwrite this person's xenogenes. Germline genes will be unaffected.</description>
-    <iconPath>GeneIcons/BF_GeneExtractor</iconPath>
+    <iconPath>GeneIcons/XPP_GeneExtractor</iconPath>
     <displayOrder>100</displayOrder>
     <hostile>true</hostile>
     <aiCanUse>false</aiCanUse>
@@ -42,7 +42,7 @@
     <comps>
       <li Class="XenotypePlusPlus.CompPropertiesExtractXenogerm">
         <genesToRetain>
-          <li>BF_Extract</li>
+          <li>XPP_Extract</li>
 					<li MayRequire="RedMattis.BigSmall.Core">BS_Xenolocked</li>
 					<li MayRequire="RedMattis.BigSmall.Core">BS_Incorporate</li>
 					<li MayRequire="RedMattis.BigSmall.Core">BS_IntegrateGenes</li>
@@ -53,11 +53,11 @@
   </AbilityDef>
 
   <GeneDef>
-    <defName>BF_ProfuseGenes</defName>
+    <defName>XPP_ProfuseGenes</defName>
     <label>profuse genes</label>
     <description>Carriers have enhanced genetic replication and transcription mechanisms, producing extra copies of their genes as backups and rapidly expressing new genes. This improves longevity and cancer resistance, and reduces the side effects of being subjected to genetic manipulation.</description>
-    <displayCategory>BF_XenotypePlusPlus</displayCategory>
-    <iconPath>GeneIcons/BF_ProfuseGenes</iconPath>
+    <displayCategory>XPP_XenotypePlusPlus</displayCategory>
+    <iconPath>GeneIcons/XPP_ProfuseGenes</iconPath>
     <biostatMet>-1</biostatMet>
     <biostatCpx>2</biostatCpx>
     <statFactors>
@@ -74,11 +74,11 @@
   </GeneDef>
 
 	<GeneDef>
-		<defName>BF_XenoCarrier</defName>
+		<defName>XPP_XenoCarrier</defName>
 		<label>xeno carrier</label>
 		<description>Carriers of this gene do not express xenogenes. Xenogerms can be installed on them, but will have no effect.</description>
-		<displayCategory>BF_XenotypePlusPlus</displayCategory>
-		<iconPath>GeneIcons/BF_XenoCarrier</iconPath>
+		<displayCategory>XPP_XenotypePlusPlus</displayCategory>
+		<iconPath>GeneIcons/XPP_XenoCarrier</iconPath>
 		<biostatMet>0</biostatMet>
 		<biostatCpx>1</biostatCpx>
 		<canGenerateInGeneSet>false</canGenerateInGeneSet>
@@ -88,12 +88,12 @@
 	</GeneDef>
 
 	<GeneDef>
-		<defName>BF_EndoGrabBag</defName>
+		<defName>XPP_EndoGrabBag</defName>
 		<geneClass>XenotypePlusPlus.GrabBagGene</geneClass>
 		<label>endogene grab bag</label>
 		<description>Carriers of this gene gain 1-10 randomized non-archite endogenes, after which this gene is removed. You shouldn't ever see this gene in-game.</description>
-		<displayCategory>BF_XenotypePlusPlus</displayCategory>
-		<iconPath>GeneIcons/BF_EndoGrabBag</iconPath>
+		<displayCategory>XPP_XenotypePlusPlus</displayCategory>
+		<iconPath>GeneIcons/XPP_EndoGrabBag</iconPath>
 		<biostatMet>0</biostatMet>
 		<biostatCpx>1</biostatCpx>
 		<canGenerateInGeneSet>false</canGenerateInGeneSet>
@@ -101,8 +101,8 @@
 			<li Class="XenotypePlusPlus.RandomGeneExtension">
 				<isXeno>false</isXeno>
 				<excludedGenes>
-					<li>BF_EndoGrabBag</li>
-					<li>BF_XenoGrabBag</li>
+					<li>XPP_EndoGrabBag</li>
+					<li>XPP_XenoGrabBag</li>
 				</excludedGenes>
 			</li>
 		</modExtensions>
@@ -112,12 +112,12 @@
 	</GeneDef>
 
 	<GeneDef>
-		<defName>BF_XenoGrabBag</defName>
+		<defName>XPP_XenoGrabBag</defName>
 		<geneClass>XenotypePlusPlus.GrabBagGene</geneClass>
 		<label>xenogene grab bag</label>
 		<description>Carriers of this gene gain 1-10 randomized non-archite xenogenes, after which this gene is removed. You shouldn't ever see this gene in-game.</description>
-		<displayCategory>BF_XenotypePlusPlus</displayCategory>
-		<iconPath>GeneIcons/BF_XenoGrabBag</iconPath>
+		<displayCategory>XPP_XenotypePlusPlus</displayCategory>
+		<iconPath>GeneIcons/XPP_XenoGrabBag</iconPath>
 		<biostatMet>0</biostatMet>
 		<biostatCpx>1</biostatCpx>
 		<canGenerateInGeneSet>false</canGenerateInGeneSet>
@@ -125,8 +125,8 @@
 			<li Class="XenotypePlusPlus.RandomGeneExtension">
 				<isXeno>true</isXeno>
 				<excludedGenes>
-					<li>BF_EndoGrabBag</li>
-					<li>BF_XenoGrabBag</li>
+					<li>XPP_EndoGrabBag</li>
+					<li>XPP_XenoGrabBag</li>
 				</excludedGenes>
 			</li>
 		</modExtensions>
@@ -136,25 +136,25 @@
 	</GeneDef>
 
 	<GeneDef>
-		<defName>BF_Kaleidoscopic</defName>
+		<defName>XPP_Kaleidoscopic</defName>
 		<exclusionTags>
 			<li>Kaleidoscopic</li>
 		</exclusionTags>
 		<geneClass>XenotypePlusPlus.KaleidoscopicGene</geneClass>
 		<label>kaleidoscopic</label>
 		<description>Carriers of this gene have an unstable, rapidly mutating genome. They periodically gain or lose a randomized non-archite xenogene.</description>
-		<displayCategory>BF_XenotypePlusPlus</displayCategory>
-		<iconPath>GeneIcons/BF_Kaleidoscopic</iconPath>
+		<displayCategory>XPP_XenotypePlusPlus</displayCategory>
+		<iconPath>GeneIcons/XPP_Kaleidoscopic</iconPath>
 		<biostatMet>0</biostatMet>
 		<biostatCpx>1</biostatCpx>
 		<modExtensions>
 			<li Class="XenotypePlusPlus.KaleidoscopicExtension">
 				<isXeno>true</isXeno>
 				<excludedGenes>
-					<li>BF_EndoGrabBag</li>
-					<li>BF_XenoGrabBag</li>
-					<li>BF_Kaleidoscopic</li>
-					<li>BF_Super_Kaleidoscopic</li>
+					<li>XPP_EndoGrabBag</li>
+					<li>XPP_XenoGrabBag</li>
+					<li>XPP_Kaleidoscopic</li>
+					<li>XPP_Super_Kaleidoscopic</li>
 				</excludedGenes>
 				<geneCount>1</geneCount>
 				<mtbDays>5</mtbDays>
@@ -166,7 +166,7 @@
 	</GeneDef>
 
 	<GeneDef>
-		<defName>BF_Super_Kaleidoscopic</defName>
+		<defName>XPP_Super_Kaleidoscopic</defName>
 		<exclusionTags>
 			<li>Kaleidoscopic</li>
 		</exclusionTags>
@@ -174,7 +174,7 @@
 		<label>super kaleidoscopic</label>
 		<description>Carriers of this gene have an extremely unstable, perpetually mutating genome. They frequently gain or lose randomized non-archite xenogenes. This gene exists for the memes and is probably not suitable for normal play.</description>
 		<displayCategory>Archite</displayCategory>
-		<iconPath>GeneIcons/BF_Super_Kaleidoscopic</iconPath>
+		<iconPath>GeneIcons/XPP_Super_Kaleidoscopic</iconPath>
 		<biostatMet>0</biostatMet>
 		<biostatCpx>1</biostatCpx>
 		<biostatArc>1</biostatArc>
@@ -183,10 +183,10 @@
 			<li Class="XenotypePlusPlus.KaleidoscopicExtension">
 				<isXeno>true</isXeno>
 				<excludedGenes>
-					<li>BF_EndoGrabBag</li>
-					<li>BF_XenoGrabBag</li>
-					<li>BF_Kaleidoscopic</li>
-					<li>BF_Super_Kaleidoscopic</li>
+					<li>XPP_EndoGrabBag</li>
+					<li>XPP_XenoGrabBag</li>
+					<li>XPP_Kaleidoscopic</li>
+					<li>XPP_Super_Kaleidoscopic</li>
 				</excludedGenes>
 				<geneCount>1~5</geneCount>
 				<mtbDays>0.2</mtbDays>

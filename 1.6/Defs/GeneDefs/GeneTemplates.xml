@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 	<XenotypePlusPlus.GeneTemplate>
-		<defName>BF_GainXenotypeTemplate</defName>
+		<defName>XPP_GainXenotypeTemplate</defName>
 		<label>{0} {1}</label>
 		<keyTag>GainXenotype</keyTag>
 		<description>Carriers of this gene gain the {0} {1} xenotype, replacing all of their {2}, after which this gene is removed. If multiple {1} xenotype genes are present, one is randomly chosen. You shouldn't ever see this gene in-game.</description>
 		<customEffectDescriptions>
 			<li>Adds {0} {1} xenotype, then vanishes</li>
 		</customEffectDescriptions>
-		<displayCategory>BF_GainXenotype</displayCategory>
+		<displayCategory>XPP_GainXenotype</displayCategory>
 		<canGenerateInGeneSet>false</canGenerateInGeneSet>
 		<selectionWeight>0</selectionWeight>
 		<ignoreIllegalLabelCharacterConfigError>true</ignoreIllegalLabelCharacterConfigError>
 	</XenotypePlusPlus.GeneTemplate>
 
 	<XenotypePlusPlus.GeneTemplate>
-		<defName>BF_NoXenogermTemplate</defName>
+		<defName>XPP_NoXenogermTemplate</defName>
 		<label>{0}</label>
 		<description>Carriers of this gene will have no xenogerm. All xenogenes will be removed, after which this gene is removed. If multiple {0} xenotype genes are present, one is randomly chosen. You shouldn't ever see this gene in-game.</description>
 		<customEffectDescriptions>
 			<li>Removes all xenogenes, then vanishes</li>
 		</customEffectDescriptions>
-		<displayCategory>BF_GainXenotype</displayCategory>
+		<displayCategory>XPP_GainXenotype</displayCategory>
 		<canGenerateInGeneSet>false</canGenerateInGeneSet>
 		<selectionWeight>0</selectionWeight>
 		<ignoreIllegalLabelCharacterConfigError>true</ignoreIllegalLabelCharacterConfigError>

@@ -42,7 +42,7 @@ namespace XenotypePlusPlus
       return xenotype.inheritable || xenotype == XenotypeDefOf.Baseliner;
     }
 
-    private static readonly List<XenotypeDef> uncopyable = [XenotypeDefOf.Baseliner, XPPDefs.NoXenogerm];
+    private static readonly List<XenotypeDef> uncopyable = [XenotypeDefOf.Baseliner, XPPDefs.XPP_NoXenogerm];
 
     public static bool IsCopyable(this XenotypeDef xenotype)
     {
@@ -97,7 +97,7 @@ namespace XenotypePlusPlus
   public static class XPPDefs
   {
     [MayRequire("Xenthur.XenotypePlusPlus")]
-    public static XenotypeDef NoXenogerm;
+    public static XenotypeDef XPP_NoXenogerm;
 
     static XPPDefs()
     {

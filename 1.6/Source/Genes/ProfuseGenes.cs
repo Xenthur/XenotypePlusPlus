@@ -166,7 +166,7 @@ namespace XenotypePlusPlus
 
     public static bool HasProfuseGenes(this Pawn pawn)
     {
-      return pawn.genes.HasActiveGene(DefDatabase<GeneDef>.GetNamedSilentFail("BF_ProfuseGenes"));
+      return pawn.genes.HasActiveGene(DefDatabase<GeneDef>.GetNamedSilentFail("XPP_ProfuseGenes"));
     }
   }
 }

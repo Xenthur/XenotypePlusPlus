@@ -140,7 +140,7 @@ namespace XenotypePlusPlus
     {
       List<Gene> result = new List<Gene>();
       var genes = pawn.genes.GenesListForReading;
-      GeneDef xenoCarrierGeneDef = DefDatabase<GeneDef>.GetNamedSilentFail("BF_XenoCarrier");
+      GeneDef xenoCarrierGeneDef = DefDatabase<GeneDef>.GetNamedSilentFail("XPP_XenoCarrier");
       for (int i = 0; i < genes.Count; i++)
       {
         if ((genes[i].Active || genes[i].overriddenByGene.def == xenoCarrierGeneDef) && genes[i].def.endogeneCategory != EndogeneCategory.Melanin)
@@ -157,7 +157,7 @@ namespace XenotypePlusPlus
 
       if (!separateGermline)
       {
-        if (!pawn.genes.Xenotype.IsCopyable())
+        if (pawn.genes.Xenotype.IsCopyable())
         {
           copiedXenotype = pawn.genes.Xenotype;
         }
@@ -167,7 +167,6 @@ namespace XenotypePlusPlus
           copiedXenotypeIcon = pawn.genes.iconDef;
         }
       }
-      Log.Error(copiedXenotypeName);
 
       return result;
     }
@@ -197,21 +196,18 @@ namespace XenotypePlusPlus
         AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype")(caster.genes) = copiedXenotype;
         caster.genes.xenotypeName = null;
         caster.genes.iconDef = null;
-        caster.genes.hybrid = false;
       }
       else if (copiedXenotypeName != null)
       {
         AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype")(caster.genes) = XenotypeDefOf.Baseliner;
         caster.genes.xenotypeName = copiedXenotypeName;
         caster.genes.iconDef = copiedXenotypeIcon;
-        caster.genes.hybrid = false;
       }
       else
       {
         AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype")(caster.genes) = XenotypeDefOf.Baseliner;
         caster.genes.xenotypeName = "Hybrid".Translate();
         caster.genes.iconDef = null;
-        caster.genes.hybrid = true;
       }
 
       GeneUtility.ExtractXenogerm(target);

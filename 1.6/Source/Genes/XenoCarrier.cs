@@ -35,7 +35,7 @@ namespace XenotypePlusPlus
 
     public static List<Gene> GetXenoCarrierGeneList(Pawn_GeneTracker genes)
     {
-      if (genes.GetGene(DefDatabase<GeneDef>.GetNamedSilentFail("BF_XenoCarrier")) != null)
+      if (genes.GetGene(DefDatabase<GeneDef>.GetNamedSilentFail("XPP_XenoCarrier")) != null)
       {
         return genes.Endogenes;
       }
@@ -71,7 +71,7 @@ namespace XenotypePlusPlus
 
     public static List<Gene> DisableIfXenoCarrier(Pawn_GeneTracker genes)
     {
-      GeneDef xenoCarrierGeneDef = DefDatabase<GeneDef>.GetNamedSilentFail("BF_XenoCarrier");
+      GeneDef xenoCarrierGeneDef = DefDatabase<GeneDef>.GetNamedSilentFail("XPP_XenoCarrier");
       Gene xenoCarrierGene = genes.Endogenes.Find(g => g.def == xenoCarrierGeneDef) ?? genes.GetGene(xenoCarrierGeneDef);
 
       if (xenoCarrierGene != null)

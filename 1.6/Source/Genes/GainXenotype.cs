@@ -121,8 +121,8 @@ namespace XenotypePlusPlus
   [HarmonyPatch]
   public static class GainXenotypeDefGenerator
   {
-    public static readonly CachedTexture germline = new("GeneIcons/BF_GainGermline");
-    public static readonly CachedTexture xenogerm = new("GeneIcons/BF_GainXenogerm");
+    public static readonly CachedTexture germline = new("GeneIcons/XPP_GainGermline");
+    public static readonly CachedTexture xenogerm = new("GeneIcons/XPP_GainXenogerm");
 
     [HarmonyPatch(typeof(GeneDefGenerator), nameof(GeneDefGenerator.ImpliedGeneDefs))]
     [HarmonyPriority(Priority.VeryLow)]
@@ -142,10 +142,10 @@ namespace XenotypePlusPlus
     public static List<GeneDef> GenerateXenotypeGenes()
     {
       var result = new List<GeneDef>();
-      var allXenotypes = DefDatabase<XenotypeDef>.AllDefsListForReading.Where((x) => x != XPPDefs.NoXenogerm);
+      var allXenotypes = DefDatabase<XenotypeDef>.AllDefsListForReading.Where((x) => x != XPPDefs.XPP_NoXenogerm);
 
-      var gainTemplate = DefDatabase<GeneTemplate>.GetNamed("BF_GainXenotypeTemplate");
-      var nxgTemplate = DefDatabase<GeneTemplate>.GetNamed("BF_NoXenogermTemplate");
+      var gainTemplate = DefDatabase<GeneTemplate>.GetNamed("XPP_GainXenotypeTemplate");
+      var nxgTemplate = DefDatabase<GeneTemplate>.GetNamed("XPP_NoXenogermTemplate");
       if (gainTemplate == null)
       {
         Log.Warning("XenotypePlusPlus DefGen: GenerateXenotypeGenes: Could not find the Gain Xenotype Template. Gain Xenotype genes will not be generated.");
@@ -233,28 +233,29 @@ namespace XenotypePlusPlus
 
     public static GeneDef GenerateNoXenogermGene(GeneTemplate template)
     {
-      if (XPPDefs.NoXenogerm == null || template == null)
+      if (XPPDefs.XPP_NoXenogerm == null || template == null)
       {
         Log.Error($"XenotypePlusPlus DefGen: GenerateXenotypeGene: One of the parameters was null." +
-            $"\nXenoDef: {XPPDefs.NoXenogerm}, template: {template}");
+            $"\nXenoDef: {XPPDefs.XPP_NoXenogerm}, template: {template}");
         return null;
       }
 
-      string defName = $"{XPPDefs.NoXenogerm.defName}_gene";
+      string defName = $"{XPPDefs.XPP_NoXenogerm.defName}_Gene";
+      //Log.Error(defName);
 
       var geneDef = new GeneDef
       {
         defName = defName,
-        label = string.Format(template.label, XPPDefs.NoXenogerm.label),
+        label = string.Format(template.label, XPPDefs.XPP_NoXenogerm.label),
         description = string.Format(template.description, "xenogerm"),
         customEffectDescriptions = [template.customEffectDescriptions[0]],
-        iconPath = XPPDefs.NoXenogerm.iconPath,
+        iconPath = XPPDefs.XPP_NoXenogerm.iconPath,
         biostatCpx = 0,
         biostatMet = 0,
         displayCategory = template.displayCategory,
         canGenerateInGeneSet = template.canGenerateInGeneSet,
         selectionWeight = template.selectionWeight,
-        modExtensions = [new GainXenotypeExtension(XPPDefs.NoXenogerm)]
+        modExtensions = [new GainXenotypeExtension(XPPDefs.XPP_NoXenogerm)]
       };
 
       return geneDef;
