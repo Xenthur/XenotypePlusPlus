@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-  <GeneDef>
+	<GeneDef>
     <defName>XPP_Extract</defName>
     <label>gene extractor</label>
     <description>Carriers of this gene can extract a copy of all of another person's genes through a somewhat gross-looking proboscis organ and integrate them as a new xenogerm. The target's genetic material will then regrow very slowly. If they extract while the target's genes are regrowing, the target will die.</description>

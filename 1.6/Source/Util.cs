@@ -42,7 +42,7 @@ namespace XenotypePlusPlus
       return xenotype.inheritable || xenotype == XenotypeDefOf.Baseliner;
     }
 
-    private static readonly List<XenotypeDef> uncopyable = [XenotypeDefOf.Baseliner, XPPDefs.XPP_NoXenogerm];
+    private static readonly List<XenotypeDef> uncopyable = [XenotypeDefOf.Baseliner];//, XPPDefs.XPP_NoXenogerm];
 
     public static bool IsCopyable(this XenotypeDef xenotype)
     {
@@ -70,8 +70,6 @@ namespace XenotypePlusPlus
       {
         GermlineComp germlineData = genes.pawn.GetComp<GermlineComp>();
         var xenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeDef>("xenotype");
-        //var xenotypeName = AccessTools.FieldRefAccess<Pawn_GeneTracker, string>("xenotypeName");
-        //var xenotypeIcon = AccessTools.FieldRefAccess<Pawn_GeneTracker, XenotypeIconDef>("iconDef");
         var cachedHasCustomXenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, bool?>("cachedHasCustomXenotype");
         var cachedCustomXenotype = AccessTools.FieldRefAccess<Pawn_GeneTracker, CustomXenotype>("cachedCustomXenotype");
 
@@ -90,18 +88,6 @@ namespace XenotypePlusPlus
       T temp = list[from];
       list.Insert(to, temp);
       list.RemoveAt((from < to) ? from : (from + 1));
-    }
-  }
-
-  [DefOf]
-  public static class XPPDefs
-  {
-    [MayRequire("Xenthur.XenotypePlusPlus")]
-    public static XenotypeDef XPP_NoXenogerm;
-
-    static XPPDefs()
-    {
-      DefOfHelper.EnsureInitializedInCtor(typeof(Util));
     }
   }
 

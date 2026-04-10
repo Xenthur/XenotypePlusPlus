@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Xml.Linq;
 using Verse;
 
 namespace XenotypePlusPlus
@@ -27,8 +28,8 @@ namespace XenotypePlusPlus
         return;
       }
       Pawn_GeneTracker genes = __instance.genes;
-      List<XenotypeDef> germlines = [.. genes.GenesListForReading.Where((g) => g is GainXenotypeGene xg && xg.GetGeneXenotype().IsGermline()).Select((g) => ((GainXenotypeGene)g).GetGeneXenotype())];
-      List<XenotypeDef> xenogerms = [.. genes.GenesListForReading.Where((g) => g is GainXenotypeGene xg && !xg.GetGeneXenotype().IsGermline()).Select((g) => ((GainXenotypeGene)g).GetGeneXenotype())];
+      List<XenotypeDef> germlines = [.. genes.GenesListForReading.Where((g) => g is GainXenotypeGene xg && xg.GetGeneXenotype() != null && xg.GetGeneXenotype().IsGermline()).Select((g) => ((GainXenotypeGene)g).GetGeneXenotype())];
+      List<XenotypeDef> xenogerms = [.. genes.GenesListForReading.Where((g) => g is GainXenotypeGene xg && (xg.GetGeneXenotype() == null || !xg.GetGeneXenotype().IsGermline())).Select((g) => ((GainXenotypeGene)g).GetGeneXenotype())];
       XenotypeDef currentXenotype = genes.Xenotype;
 
       if (!germlines.Empty())
@@ -79,7 +80,14 @@ namespace XenotypePlusPlus
       if (!xenogerms.Empty())
       {
         XenotypeDef selectedXenogerm = xenogerms.RandomElement();
-        genes.SetXenotype(selectedXenogerm);
+        if (selectedXenogerm == null)
+        {
+          genes.RemoveXenogerm();
+        }
+        else
+        {
+          genes.SetXenotype(selectedXenogerm);
+        }
       }
 
       foreach (Gene gene in genes.GenesListForReading.Where((g) => g is GainXenotypeGene xg))
@@ -142,7 +150,7 @@ namespace XenotypePlusPlus
     public static List<GeneDef> GenerateXenotypeGenes()
     {
       var result = new List<GeneDef>();
-      var allXenotypes = DefDatabase<XenotypeDef>.AllDefsListForReading.Where((x) => x != XPPDefs.XPP_NoXenogerm);
+      var allXenotypes = DefDatabase<XenotypeDef>.AllDefsListForReading;
 
       var gainTemplate = DefDatabase<GeneTemplate>.GetNamed("XPP_GainXenotypeTemplate");
       var nxgTemplate = DefDatabase<GeneTemplate>.GetNamed("XPP_NoXenogermTemplate");
@@ -233,29 +241,28 @@ namespace XenotypePlusPlus
 
     public static GeneDef GenerateNoXenogermGene(GeneTemplate template)
     {
-      if (XPPDefs.XPP_NoXenogerm == null || template == null)
+      if (template == null)
       {
         Log.Error($"XenotypePlusPlus DefGen: GenerateXenotypeGene: One of the parameters was null." +
-            $"\nXenoDef: {XPPDefs.XPP_NoXenogerm}, template: {template}");
+            $"\ntemplate: {template}");
         return null;
       }
 
-      string defName = $"{XPPDefs.XPP_NoXenogerm.defName}_Gene";
-      //Log.Error(defName);
+      string defName = $"XPP_NoXenogerm_Gene";
 
       var geneDef = new GeneDef
       {
         defName = defName,
-        label = string.Format(template.label, XPPDefs.XPP_NoXenogerm.label),
+        label = string.Format(template.label, "no xenogerm"),
         description = string.Format(template.description, "xenogerm"),
         customEffectDescriptions = [template.customEffectDescriptions[0]],
-        iconPath = XPPDefs.XPP_NoXenogerm.iconPath,
+        iconPath = "XenotypeIcons/XPP_NoXenogerm",
         biostatCpx = 0,
         biostatMet = 0,
         displayCategory = template.displayCategory,
         canGenerateInGeneSet = template.canGenerateInGeneSet,
         selectionWeight = template.selectionWeight,
-        modExtensions = [new GainXenotypeExtension(XPPDefs.XPP_NoXenogerm)]
+        modExtensions = [new GainXenotypeExtension(null)]
       };
 
       return geneDef;
@@ -266,7 +273,7 @@ namespace XenotypePlusPlus
       if (gene.geneClass == typeof(GainXenotypeGene))
       {
         var extension = gene.GetModExtension<GainXenotypeExtension>() ?? new GainXenotypeExtension();
-        return extension.xenotype.IsGermline() ? germline : xenogerm;
+        return extension.xenotype != null && extension.xenotype.IsGermline() ? germline : xenogerm;
       }
       return previous;
     }

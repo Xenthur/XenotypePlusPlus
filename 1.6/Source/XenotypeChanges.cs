@@ -297,58 +297,32 @@ namespace XenotypePlusPlus
       }
     }
 
-    public static bool TryNoXenogerm(Pawn_GeneTracker genes, XenotypeDef xenotype)
-    {
-      if (xenotype == XPPDefs.XPP_NoXenogerm)
-      {
-        genes.RemoveXenogerm();
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    }
-
     [HarmonyPatch(typeof(Pawn_GeneTracker), nameof(Pawn_GeneTracker.SetXenotype))]
     [HarmonyTranspiler]
     public static IEnumerable<CodeInstruction> PatchSetXenotype(IEnumerable<CodeInstruction> instructions, ILGenerator il)
     {
       var validateMethod = AccessTools.Method(typeof(XenotypeChanges), nameof(KeepXenotype));
       var germlineMethod = AccessTools.Method(typeof(XenotypeChanges), nameof(UpdateGermline));
-      var tryNoXenogermMethod = AccessTools.Method(typeof(XenotypeChanges), nameof(TryNoXenogerm));
 
       bool flag = false;
       bool flag2 = false;
-      bool flag3 = false;
       Label label = il.DefineLabel();
       Label label2 = il.DefineLabel();
       List<CodeInstruction> codes = [.. instructions];
       for (int i = 0; i < codes.Count; i++)
       {
-        if (!flag && codes[i].opcode == OpCodes.Ldarg_0)
+        if (!flag && codes[i].opcode == OpCodes.Ldarg_1)
         {
           flag = true;
-          yield return codes[i];
-          yield return new CodeInstruction(OpCodes.Ldarg_1);
-          yield return new CodeInstruction(OpCodes.Call, tryNoXenogermMethod);
-          yield return new CodeInstruction(OpCodes.Brfalse, label);
-          yield return new CodeInstruction(OpCodes.Ret);
-          yield return new CodeInstruction(OpCodes.Nop).WithLabels(label);
-          yield return new CodeInstruction(OpCodes.Ldarg_0);
-        }
-        else if (!flag2 && codes[i].opcode == OpCodes.Ldarg_1)
-        {
-          flag2 = true;
           yield return codes[i];
           yield return new CodeInstruction(OpCodes.Call, validateMethod);
           yield return new CodeInstruction(OpCodes.Brtrue, label2);
           yield return new CodeInstruction(OpCodes.Ldarg_0);
           yield return new CodeInstruction(OpCodes.Ldarg_1);
         }
-        else if (!flag3 && i + 1 < codes.Count && codes[i + 1].opcode == OpCodes.Call && codes[i + 1].operand is MethodInfo methodInfo && methodInfo.Name == nameof(Pawn_GeneTracker.ClearXenogenes))
+        else if (!flag2 && i + 1 < codes.Count && codes[i + 1].opcode == OpCodes.Call && codes[i + 1].operand is MethodInfo methodInfo && methodInfo.Name == nameof(Pawn_GeneTracker.ClearXenogenes))
         {
-          flag3 = true;
+          flag2 = true;
           yield return new CodeInstruction(OpCodes.Nop).WithLabels(label2);
           yield return codes[i];
         }
@@ -372,7 +346,6 @@ namespace XenotypePlusPlus
     {
       var validateMethod = AccessTools.Method(typeof(XenotypeChanges), nameof(KeepXenotype));
       var germlineMethod = AccessTools.Method(typeof(XenotypeChanges), nameof(UpdateGermline));
-      var tryNoXenogermMethod = AccessTools.Method(typeof(XenotypeChanges), nameof(TryNoXenogerm));
 
       bool flag = false;
       bool flag2 = false;
@@ -383,18 +356,7 @@ namespace XenotypePlusPlus
 
       for (int i = 0; i < codes.Count; i++)
       {
-        if (!flag && codes[i].opcode == OpCodes.Ldarg_0)
-        {
-          flag = true;
-          yield return new CodeInstruction(OpCodes.Ldarg_0);
-          yield return new CodeInstruction(OpCodes.Ldarg_1);
-          yield return new CodeInstruction(OpCodes.Call, tryNoXenogermMethod);
-          yield return new CodeInstruction(OpCodes.Brfalse, label);
-          yield return new CodeInstruction(OpCodes.Ret);
-          yield return new CodeInstruction(OpCodes.Nop).WithLabels(label);
-          yield return codes[i];
-        }
-        else if (!flag && codes[i].opcode == OpCodes.Ldarg_1)
+        if (!flag && codes[i].opcode == OpCodes.Ldarg_1)
         {
           flag = true;
           yield return codes[i];
@@ -727,7 +689,8 @@ namespace XenotypePlusPlus
       {
         return GeneUtility.UniqueXenotypeTex.Texture;
       }
-      return XPPDefs.XPP_NoXenogerm.Icon;
+      return ContentFinder<Texture2D>.Get("XenotypeIcons/XPP_NoXenogerm");
+      //return XPPDefs.XPP_NoXenogerm.Icon;
     }
 
     private static string GetXenotypeLabel(int startingPawnIndex)
@@ -967,7 +930,7 @@ namespace XenotypePlusPlus
           setupGenerationRequest.Invoke(null, [index2, existing.ForcedXenotype, existing.ForcedCustomXenotype, existing.AllowedXenotypes, 0.5f, (PawnGenerationRequest existing) => allowChange, randomizeCallback, true]);
         }),
       };
-      foreach (XenotypeDef item in DefDatabase<XenotypeDef>.AllDefs.Where((XenotypeDef x) => x != XenotypeDefOf.Baseliner && x != XPPDefs.XPP_NoXenogerm && !x.inheritable).OrderBy((XenotypeDef x) => 0f - x.displayPriority))
+      foreach (XenotypeDef item in DefDatabase<XenotypeDef>.AllDefs.Where((XenotypeDef x) => x != XenotypeDefOf.Baseliner && !x.inheritable).OrderBy((XenotypeDef x) => 0f - x.displayPriority))
       {
         XenotypeDef xenotype2 = item;
         list.Add(new FloatMenuOption(xenotype2.LabelCap, delegate
